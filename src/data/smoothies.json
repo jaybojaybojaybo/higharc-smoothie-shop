@@ -1,5 +1,36 @@
 {
-    "smoothies": {
-        
-    }
+    "smoothies": [
+        {
+            "id": 0,
+            "name": "newSmoothie-001",
+            "ingredients": [
+                {
+                    "id": 0,
+                    "name": "Milk",
+                    "type": "Dairy"
+                },
+                {
+                    "id": 1,
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "name": "newSmoothie-002",
+            "ingredients": [
+                {
+                    "id": 1,
+                    "name": "Oat Milk",
+                    "type": "Non-Dairy"
+                },
+                {
+                    "id": 1,
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        }
+    ]
 }
