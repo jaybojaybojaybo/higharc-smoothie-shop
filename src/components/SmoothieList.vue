@@ -1,24 +1,24 @@
 <template>
     <p class="bg-blue-600 text-white">The list of smoothies</p>
-    <p v-for="(smoothie, index) in smoothies">{{ smoothie.name }}</p>
+    <p v-for="(smoothie, index) of smoothiesList" :key="index">{{ smoothie.name }}</p>
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import { Smoothie } from "../models/Smoothie"
 
-import {getAllSmoothies} from '../api/read'
+import { getAllSmoothies } from '../api/read'
 
-export default {
+export default defineComponent({
     setup() {
-        let smoothies = ref<Smoothie[]>()
+        let smoothiesList = ref<Smoothie[]>()
         onMounted(async () => {
             console.log('hey what')
-            smoothies.value = await getAllSmoothies() as Smoothie[]
+            smoothiesList.value = await getAllSmoothies() as Smoothie[]
         })
         return {
-            smoothies
+            smoothiesList
         }
     }
-}
+})
 </script>
