@@ -1,6 +1,6 @@
 import {IngredientType} from './IngredientType'
 
-export interface Ingredient {
+export default interface Ingredient extends Object{
     id: number,
     name: string,
     type: IngredientType
