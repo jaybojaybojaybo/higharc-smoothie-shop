@@ -1,0 +1,19 @@
+{
+    "ingredients": [
+        {
+            "id": 0,
+            "name": "Milk",
+            "type": "Dairy"
+        },
+        {
+            "id": 1,
+            "name": "Blueberries",
+            "type": "Fruit"
+        },
+        {
+            "id": 2,
+            "name": "Oat Milk",
+            "type": "Non-Dairy"
+        }
+    ]
+}
