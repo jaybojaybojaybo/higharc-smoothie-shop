@@ -1,10 +1,10 @@
 <template>
+    <!-- HANDLE STYLING WITHIN THE CARD -->
     <div class="p-5">
-        <h1 class="font-bold">{{ smoothieData.name }}</h1>
+        <h1 class="text-2xl font-bold">{{ smoothieData.name }}</h1>
         <h2>Ingredients:</h2>
-        <li v-for="(ingredient, index) in smoothieData.ingredients">
-            {{ ingredient.name }}
-            {{ ingredient.type }}
+        <li v-for="(ingredient, index) in smoothieData.ingredients" class="list-none">
+            <span class="font-bold"> {{ ingredient.name }} </span> Type: {{ ingredient.type }}
         </li>
     </div>
 </template>

@@ -1,5 +1,6 @@
 <template>
-    <p class="bg-blue-600 text-white">The list of smoothies</p>
+    <p class="font-semibold">The list of smoothies:</p>
+    <!-- HANDLE FORMATTING OF THE LIST -->
     <SmoothieCard v-for="(smoothie, index) of smoothiesList" :key="index" :smoothie="smoothie"></SmoothieCard>
 </template>
 
