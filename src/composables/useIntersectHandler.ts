@@ -1,23 +1,24 @@
 import { Ref } from 'vue'
-import { Scene, Vector3, Intersection, InstancedMesh } from 'three'
-// import Smoothie from '../models/Smoothie'
+import { Scene, Vector3, Intersection, Mesh, InstancedMesh } from 'three'
+import Smoothie from '../models/Smoothie'
+import { CSS3DSprite } from 'three/examples/jsm/renderers/CSS3DRenderer'
 
-export default function useIntersectHandler(event: MouseEvent, raycasterRef: Ref, webGLScene: Scene, smoothies: any, selectedSmoothies: Ref<any>, selectedSmoothiePoints: Ref<Vector3>, clearSmoothieSelection: VoidFunction) {
+export default function useIntersectHandler(event: MouseEvent, raycasterRef: Ref, webGLScene: Scene, smoothies: Ref<Smoothie[]>, selectedSmoothie: Ref<Smoothie>, clearSmoothieSelection: VoidFunction) {  
   event.preventDefault()
   // Find intersections.
   let intersects = raycasterRef.value.intersectObjects(webGLScene.children, true) as Intersection[]
   if (intersects.length > 0) {
-    // Console logging the array of intersections.
     for (const intersect of intersects) {
       if (intersect.object instanceof InstancedMesh) {
-        if (selectedSmoothies.value.length) {
+        console.log('this the one! ', intersect)
+        if (selectedSmoothie.value) {
           clearSmoothieSelection()
         }
         //@ts-ignore
-        selectedSmoothies.value?.push(smoothies[Smoothie.instanceId])
-        selectedSmoothiePoints.value = intersect.point
+        selectedSmoothie.value = smoothies.value[intersect.instanceId as number]
+        console.log('SELECTENING: ', selectedSmoothie.value)
         break
-      }
+      } 
     intersects = []
     }
   }
