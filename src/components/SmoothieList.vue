@@ -1,14 +1,22 @@
 <template>
     <SmoothieCard   :smoothies="smoothiesList"
                     :coords="smoothiePoints"
-                    @deleteSmoothie="onDeleteSmoothie">
+                    @deleteSmoothie="onDeleteSmoothie"
+                    ref="card">
     </SmoothieCard>
-    <ReadoutDisplay :smoothie="selectedSmoothie" @addSmoothie="onAddSmoothie" @deleteSmoothie="onDeleteSmoothie"></ReadoutDisplay>
+    <ReadoutDisplay :smoothie="selectedSmoothie" 
+                    @addSmoothie="onAddSmoothie" 
+                    @deleteSmoothie="onDeleteSmoothie"
+                    ref="readout"
+    >
+    </ReadoutDisplay>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, reactive, provide, Ref } from "vue"
+
 import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh } from 'three'
+import { CSS3DSprite } from "three/examples/jsm/renderers/CSS3DRenderer";
 
 import Smoothie from "../models/Smoothie"
 import SmoothieCard from "./SmoothieCard.vue"
@@ -36,12 +44,24 @@ export default defineComponent({
         const gridSize = ref(0) // in meters
         const selectedSmoothie = ref({}) as Ref<Smoothie>
         const selectedSmoothiePoint = ref(new Vector3(0, 0, 0)) as Ref<Vector3>
+        const card = ref<InstanceType<typeof SmoothieCard>>()
+        const readout = ref<InstanceType<typeof ReadoutDisplay>>()
 
-        const onAddSmoothie = () => {
-            if (debug === true) { console.log('adding smoothie!') }
+        const onAddSmoothie = (newSmoothie: Smoothie) => {
+            smoothiesList.value.push(newSmoothie)
+            if (debug === true) { console.log('adding smoothie!', smoothiesList.value) }
+            css3dScene.children.forEach((child) => {
+                if (child instanceof CSS3DSprite) {
+                    child.parent?.remove(child)
+                }
+            })
+            listInit(scene);
+            (card.value as InstanceType<typeof SmoothieCard>).initInstancedSmoothies(smoothiesList.value);
+            (readout.value as InstanceType<typeof ReadoutDisplay>).addFormInit();
         }
-        const onDeleteSmoothie = () => {
-            if (debug === true) { console.log('deleting smoothie!') }
+        const onDeleteSmoothie = (name: string) => {
+            smoothiesList.value = smoothiesList.value?.filter((s) => s.name !== name)
+            if (debug === true) {console.log('deleting smoothie! ', smoothiesList.value?.filter((s) => s.name !== name))}
         }
 
         // THREE.JS SETUP
@@ -175,8 +195,10 @@ export default defineComponent({
             onAddSmoothie,
             onDeleteSmoothie,
             selectedSmoothie,
-            selectedSmoothiePoint
+            selectedSmoothiePoint,
+            card,
+            readout
         }
     }
 })
-</script>
+</script> 
