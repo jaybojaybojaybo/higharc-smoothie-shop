@@ -4,12 +4,16 @@
                     @deleteSmoothie="onDeleteSmoothie"
                     ref="card">
     </SmoothieCard>
-    <ReadoutDisplay :smoothie="selectedSmoothie" 
-                    @addSmoothie="onAddSmoothie" 
-                    @deleteSmoothie="onDeleteSmoothie"
-                    ref="readout"
-    >
-    </ReadoutDisplay>
+    <AddSmoothieForm    v-if="addMode" 
+                        @addSmoothie="onAddSmoothie" 
+                        @deleteSmoothie="onDeleteSmoothie"
+                        ref="addForm">
+    </AddSmoothieForm>
+    <SmoothieDetails    v-if="!addMode"
+                        @addSmoothie="onAddSmoothie" 
+                        @deleteSmoothie="onDeleteSmoothie"
+                        ref="details">
+    </SmoothieDetails>
 </template>
 
 <script lang="ts">
@@ -20,7 +24,8 @@ import { CSS3DSprite } from "three/examples/jsm/renderers/CSS3DRenderer";
 
 import Smoothie from "../models/Smoothie"
 import SmoothieCard from "./SmoothieCard.vue"
-import ReadoutDisplay from "./ReadoutDisplay.vue"
+import AddSmoothieForm from "./AddSmoothieForm.vue"
+import SmoothieDetails from "./SmoothieDetails.vue"
 import { getAllSmoothies } from '../api/read'
 
 import useWebGLRenderer from '../composables/useWebGLRenderer'
@@ -35,7 +40,8 @@ import useIntersectHandler from '../composables/useIntersectHandler'
 export default defineComponent({
     components: {
         SmoothieCard,
-        ReadoutDisplay
+        AddSmoothieForm,
+        SmoothieDetails
     },
     setup() {
         const debug = true
@@ -45,7 +51,8 @@ export default defineComponent({
         const selectedSmoothie = ref({}) as Ref<Smoothie>
         const selectedSmoothiePoint = ref(new Vector3(0, 0, 0)) as Ref<Vector3>
         const card = ref<InstanceType<typeof SmoothieCard>>()
-        const readout = ref<InstanceType<typeof ReadoutDisplay>>()
+        const addForm = ref<InstanceType<typeof AddSmoothieForm>>()
+        const addMode = ref<Boolean>(true)
 
         const onAddSmoothie = (newSmoothie: Smoothie) => {
             smoothiesList.value.push(newSmoothie)
@@ -57,7 +64,7 @@ export default defineComponent({
             })
             listInit(scene);
             (card.value as InstanceType<typeof SmoothieCard>).initInstancedSmoothies(smoothiesList.value);
-            (readout.value as InstanceType<typeof ReadoutDisplay>).addFormInit();
+            (addForm.value as InstanceType<typeof AddSmoothieForm>).addFormInit();
         }
         const onDeleteSmoothie = (name: string) => {
             smoothiesList.value = smoothiesList.value?.filter((s) => s.name !== name)
@@ -95,6 +102,7 @@ export default defineComponent({
         function clearSmoothieSelection(): void {
             selectedSmoothie.value = {} as Smoothie
             selectedSmoothiePoint.value = new Vector3(0, 0, 0)
+            addMode.value = false
         }
         // Smoothie Click
         function handleIntersects(event: MouseEvent) { 
@@ -106,6 +114,7 @@ export default defineComponent({
                 selectedSmoothie, 
                 clearSmoothieSelection
             )
+            addMode.value = true
         }
         css3DRenderer.domElement.addEventListener('click', handleIntersects, true)
 
@@ -197,7 +206,8 @@ export default defineComponent({
             selectedSmoothie,
             selectedSmoothiePoint,
             card,
-            readout
+            addForm,
+            addMode
         }
     }
 })
