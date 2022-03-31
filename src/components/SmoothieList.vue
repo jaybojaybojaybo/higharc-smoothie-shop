@@ -1,5 +1,8 @@
 <template>
-    <!-- HANDLE FORMATTING OF THE LIST -->
+    <SmoothieCard   :smoothies="smoothiesList"
+                    :coords="smoothiePoints"
+                    @deleteSmoothie="onDeleteSmoothie">
+    </SmoothieCard>
 </template>
 
 <script lang="ts">
@@ -7,6 +10,7 @@ import { defineComponent, onMounted, onUnmounted, ref, reactive, provide } from 
 import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh } from 'three'
 
 import Smoothie from "../models/Smoothie"
+import SmoothieCard from "./SmoothieCard.vue"
 import { getAllSmoothies } from '../api/read'
 
 import useWebGLRenderer from '../composables/useWebGLRenderer'
@@ -19,12 +23,20 @@ import useMouseMove from '../composables/useMouseMove'
 
 export default defineComponent({
     components: {
+        SmoothieCard
     },
     setup() {
         const debug = true
         const smoothiesList = ref<Smoothie[]>([])
         const smoothiePoints = ref<Vector3[]>([])
         const gridSize = ref(0) // in meters
+
+        const onAddSmoothie = () => {
+            if (debug === true) { console.log('adding smoothie!') }
+        }
+        const onDeleteSmoothie = () => {
+            if (debug === true) { console.log('deleting smoothie!') }
+        }
 
         // THREE.JS SETUP
         const scene = new Scene()
@@ -133,7 +145,10 @@ export default defineComponent({
         })
 
         return {
-            smoothiesList
+            smoothiesList,
+            smoothiePoints,
+            onAddSmoothie,
+            onDeleteSmoothie
         }
     }
 })
