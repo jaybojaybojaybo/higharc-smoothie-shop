@@ -3,14 +3,16 @@
                     :coords="smoothiePoints"
                     @deleteSmoothie="onDeleteSmoothie">
     </SmoothieCard>
+    <ReadoutDisplay :smoothie="selectedSmoothie" @addSmoothie="onAddSmoothie" @deleteSmoothie="onDeleteSmoothie"></ReadoutDisplay>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, reactive, provide } from "vue"
+import { defineComponent, onMounted, onUnmounted, ref, reactive, provide, Ref } from "vue"
 import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh } from 'three'
 
 import Smoothie from "../models/Smoothie"
 import SmoothieCard from "./SmoothieCard.vue"
+import ReadoutDisplay from "./ReadoutDisplay.vue"
 import { getAllSmoothies } from '../api/read'
 
 import useWebGLRenderer from '../composables/useWebGLRenderer'
@@ -20,16 +22,20 @@ import useMapControls from '../composables/useMapControls'
 import useRaycasting from '../composables/useRaycasting'
 import useResizeHandler from '../composables/useResizeHandler'
 import useMouseMove from '../composables/useMouseMove'
+import useIntersectHandler from '../composables/useIntersectHandler'
 
 export default defineComponent({
     components: {
-        SmoothieCard
+        SmoothieCard,
+        ReadoutDisplay
     },
     setup() {
         const debug = true
         const smoothiesList = ref<Smoothie[]>([])
         const smoothiePoints = ref<Vector3[]>([])
         const gridSize = ref(0) // in meters
+        const selectedSmoothie = ref({}) as Ref<Smoothie>
+        const selectedSmoothiePoint = ref(new Vector3(0, 0, 0)) as Ref<Vector3>
 
         const onAddSmoothie = () => {
             if (debug === true) { console.log('adding smoothie!') }
@@ -63,6 +69,25 @@ export default defineComponent({
         // * RAYCASTER * //
         const { raycasterRef, mouseRef } = useRaycasting()
         raycasterRef.value.setFromCamera(mouseRef.value, perspCamera)
+
+        // * EVENTS * //
+        // Smoothie Selection
+        function clearSmoothieSelection(): void {
+            selectedSmoothie.value = {} as Smoothie
+            selectedSmoothiePoint.value = new Vector3(0, 0, 0)
+        }
+        // Smoothie Click
+        function handleIntersects(event: MouseEvent) { 
+            useIntersectHandler(
+                event, 
+                raycasterRef, 
+                scene, 
+                smoothiesList as Ref<Smoothie[]>, 
+                selectedSmoothie, 
+                clearSmoothieSelection
+            )
+        }
+        css3DRenderer.domElement.addEventListener('click', handleIntersects, true)
 
         // * List 3D OBJECT METHODS * //
         function listDestroy(scene: Scene): void {
@@ -148,7 +173,9 @@ export default defineComponent({
             smoothiesList,
             smoothiePoints,
             onAddSmoothie,
-            onDeleteSmoothie
+            onDeleteSmoothie,
+            selectedSmoothie,
+            selectedSmoothiePoint
         }
     }
 })
