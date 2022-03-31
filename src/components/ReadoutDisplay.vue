@@ -3,7 +3,7 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, onUnmounted, PropType, toRef, ref, watch } from "vue";
 
-import { Scene, Vector3, Event, Color } from "three"; //Removed Color
+import { Scene, Vector3, Event, Color, Object3D } from "three"; //Removed Color
 import { CSS3DSprite } from "three/examples/jsm/renderers/CSS3DRenderer";
 
 import Smoothie from "../models/Smoothie";
@@ -21,12 +21,12 @@ export default defineComponent({
     emits: ['addSmoothie', 'deleteSmoothie'],
     setup(props, { emit }) {
         const currentSmoothie = toRef(props, 'smoothie')
-        const parentScene = inject("css3dScene") as Scene;
+        const css3dScene = inject("css3dScene") as Scene;
         const ingredientOptions = ref([] as Ingredient[])
         const contentString = ref("")
         const css = ref({} as CSS3DSprite)
 
-        const addFormInit = async() => {
+        async function addFormInit() {            
             // GET INGREDIENT OPTIONS
             ingredientOptions.value = await getAllIngredients() as Ingredient[]
             let ingredientsInputs = ref("")
@@ -76,7 +76,7 @@ export default defineComponent({
             // LISTENERS
             css.value.element.addEventListener('mousedown', handleClick, true)
             // ADD TO SCENE
-            parentScene.add(css.value);
+            css3dScene.add(css.value);
         }
 
         watch(
@@ -141,7 +141,8 @@ export default defineComponent({
         }
 
         return {
-            handleClick
+            handleClick,
+            addFormInit
         }
     },
 });
