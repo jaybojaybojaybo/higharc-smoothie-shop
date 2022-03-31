@@ -1,11 +1,10 @@
 <template>
-    <p class="font-semibold">The list of smoothies:</p>
     <!-- HANDLE FORMATTING OF THE LIST -->
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, reactive, provide } from "vue"
-import { Scene, Color, DirectionalLight, HemisphereLight } from 'three'
+import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh } from 'three'
 
 import Smoothie from "../models/Smoothie"
 import { getAllSmoothies } from '../api/read'
@@ -22,7 +21,9 @@ export default defineComponent({
     components: {
     },
     setup() {
+        const debug = true
         const smoothiesList = ref<Smoothie[]>([])
+        const smoothiePoints = ref<Vector3[]>([])
         const gridSize = ref(0) // in meters
 
         // THREE.JS SETUP
@@ -50,6 +51,35 @@ export default defineComponent({
         // * RAYCASTER * //
         const { raycasterRef, mouseRef } = useRaycasting()
         raycasterRef.value.setFromCamera(mouseRef.value, perspCamera)
+
+        // * List 3D OBJECT METHODS * //
+        function listDestroy(scene: Scene): void {
+            scene.remove.apply(scene, scene.children)
+        }
+        function listInit(scene: Scene): void {
+            gridSize.value = Math.round(Math.sqrt((smoothiesList.value as Smoothie[]).length))
+            // SET BACKGROUND WALL SIZE
+            let shopGeo = new PlaneGeometry(gridSize.value * 2, gridSize.value * 2)
+            let shopMat = new MeshBasicMaterial({color: 0xb09c61, side: DoubleSide})
+            let shopWall = new Mesh(shopGeo, shopMat)
+            shopWall.position.z = -5
+            scene.add(shopWall)
+            // SET GRID
+            smoothiePoints.value = smoothiesList.value.map((ssl) => {
+                let x, y, z
+                x = y = z = 0
+                const index = smoothiesList.value.indexOf(ssl)
+                if (debug === true) {console.log('gridsize: ', gridSize.value)}
+                if (gridSize.value > 1) {
+                    x = index%gridSize.value - Math.ceil(gridSize.value/2)/2
+                    y = Math.floor(index/gridSize.value) - gridSize.value/2
+                } else if (gridSize.value === 1) {
+                    x = (index + 1)/gridSize.value - (gridSize.value * 1.5)
+                } 
+                return new Vector3(x, y, z)
+            })
+            if (debug === true) {console.log('sessionPoints: ', smoothiePoints.value)}
+        }
 
         // * RENDER LOOP - RECURSIVE * //
         const animate = () => {
@@ -90,6 +120,7 @@ export default defineComponent({
             useMouseMove(css3DRenderer.domElement, mouseRef.value)
             // EVENTS
             window.addEventListener('resize', handleResize, true)
+            listInit(scene)
             animate()
         })
 
@@ -97,7 +128,8 @@ export default defineComponent({
             document.querySelector('#app')?.removeChild(webGLRenderer.domElement)
             document.querySelector('#app')?.removeChild(css3DRenderer.domElement)
             window.removeEventListener('resize', handleResize, true)
-            // window.localStorage.setItem('smoothies', JSON.stringify(sessionSmoothiesList.value))
+            // window.localStorage.setItem('smoothies', JSON.stringify(smoothiesList.value))
+            listDestroy(scene)
         })
 
         return {
