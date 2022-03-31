@@ -34,7 +34,7 @@ export default defineComponent({
         // This version traverses the glTF for its children.
         const smoothieCount = computed(() => smoothieData.value.length)
 
-        const initInstancedSmoothies = (smoothies: Smoothie[]) => {
+        function initInstancedSmoothies(smoothies: Smoothie[]) {
             console.log('initting instanced Smoothie')
             const loader = new GLTFLoader()
             loader.load("/Smoothie.glb", (gltf) => {
@@ -97,11 +97,6 @@ export default defineComponent({
                         child.parent?.remove(child)
                     }
                 })
-                css3dScene.children.forEach((child) => {
-                    if (child.name === 'name') {
-                        child.parent?.remove(child)
-                    }
-                })
                 initInstancedSmoothies(smoothieData.value)
             }
         )
@@ -112,6 +107,7 @@ export default defineComponent({
 
         return {
             smoothieData,
+            initInstancedSmoothies,
         }
     }
 })
