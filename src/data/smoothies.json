@@ -1,32 +1,98 @@
 {
     "smoothies": [
         {
-            "id": 0,
-            "name": "newSmoothie-001",
+            "name": "Blue Moo",
             "ingredients": [
                 {
-                    "id": 0,
                     "name": "Milk",
                     "type": "Dairy"
                 },
                 {
-                    "id": 1,
                     "name": "Blueberries",
                     "type": "Fruit"
                 }
             ]
         },
         {
-            "id": 1,
-            "name": "newSmoothie-002",
+            "name": "Blue No Moo",
             "ingredients": [
                 {
-                    "id": 1,
                     "name": "Oat Milk",
                     "type": "Non-Dairy"
                 },
                 {
-                    "id": 1,
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Blue",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Red",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Green",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Orange",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Purple",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Raspberry",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Gold",
+            "ingredients": [                
+                {
+                    "name": "Blueberries",
+                    "type": "Fruit"
+                }
+            ]
+        },
+        {
+            "name": "Silver",
+            "ingredients": [                
+                {
                     "name": "Blueberries",
                     "type": "Fruit"
                 }
