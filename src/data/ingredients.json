@@ -1,19 +1,77 @@
 {
     "ingredients": [
         {
-            "id": 0,
             "name": "Milk",
             "type": "Dairy"
         },
         {
-            "id": 1,
+            "name": "Yogurt",
+            "type": "Dairy"
+        },
+        {
+            "name": "Oat Milk",
+            "type": "Non-Dairy"
+        },
+        {
+            "name": "Almond Milk",
+            "type": "Non-Dairy"
+        },
+        {
+            "name": "Cashew Milk",
+            "type": "Non-Dairy"
+        },
+        {
+            "name": "Hemp Milk",
+            "type": "Non-Dairy"
+        },
+        {
             "name": "Blueberries",
             "type": "Fruit"
         },
         {
-            "id": 2,
-            "name": "Oat Milk",
-            "type": "Non-Dairy"
+            "name": "Strawberies",
+            "type": "Fruit"
+        },
+        {
+            "name": "Raspberries",
+            "type": "Fruit"
+        },
+        {
+            "name": "Banana",
+            "type": "Fruit"
+        },
+        {
+            "name": "Apple",
+            "type": "Fruit"
+        },
+        {
+            "name": "Mango",
+            "type": "Fruit"
+        },
+        {
+            "name": "Avocado",
+            "type": "Fruit"
+        },
+        {
+            "name": "Spinach",
+            "type": "Vegetable"
+        },
+        {
+            "name": "Kale",
+            "type": "Vegetable"
+        },
+        {
+            "name": "Chia Seeds",
+            "type": "Add-on"
+        },
+        {
+            "name": "Spirulina",
+            "type": "Add-on"
+        },
+        {
+            "name": "Cacao",
+            "type": "Add-on"
         }
+        
     ]
 }
