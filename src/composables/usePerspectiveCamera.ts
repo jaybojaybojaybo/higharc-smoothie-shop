@@ -9,16 +9,17 @@ export default function usePerspectiveCamera(listWidth: number, width: number, h
   const perspCamera = new PerspectiveCamera(fov, aspectRatio, near, far)
 
   // starting position
-  const z = 5
+  const x = 0
   const y = 0
+  const z = 8
   // const z = Math.tan(30 * Math.PI/180) * listWidth
   // const y = Math.tan(20 * Math.PI/180) * z
-  perspCamera.position.set(0, y, z)
+  perspCamera.position.set(x, y, z)
   perspCamera.lookAt(0, 0 ,0)
   perspCamera.updateProjectionMatrix()
-  perspCamera.layers.enable(0)
-  perspCamera.layers.enable(1)
-  perspCamera.layers.enable(2)
+  // perspCamera.layers.enable(0)
+  // perspCamera.layers.enable(1)
+  // perspCamera.layers.enable(2)
 
   perspCamera.name = "perspCamera"
 
