@@ -34,6 +34,40 @@ export default defineComponent({
         // This version traverses the glTF for its children.
         const smoothieCount = computed(() => smoothieData.value.length)
 
+        function initSmoothie(smoothie: Smoothie, point: Vector3) {
+            const loader = new GLTFLoader()
+            loader.load("/Smoothie.glb", (gltf) => {
+                let model = gltf.scene
+                model.traverse(function (child) {
+                    if (child instanceof Mesh) {
+                        child.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                        (child.material as MeshStandardMaterial).side = DoubleSide;
+                    }                    
+                    // ADD CSS3DSPRITE TO CSS3DSCENE FOR EACH SMOOTHIE AT SMOOTHIE'S COORDS
+                    let smoothieHeaderString = 
+                        `<h1 class="text-2xl font-bold text-white p-1">${smoothie.name}</h1>`
+                    // PREP FORM FOR CSS3D
+                    const smoothieLabel = new DOMParser().parseFromString(
+                        smoothieHeaderString,
+                        "text/html"
+                    );
+                    smoothieLabel.body.style.background = new Color(0x00bae9).getStyle()
+                    // smoothieLabel.body.style.opacity = "0.25"
+                    // CREATE CSS3D
+                    let css = new CSS3DSprite(smoothieLabel.body);
+                    // let smoothieMeshPosition = (smoothieMesh.position as Vector3)
+                    css.name = 'name'
+                    css.position.copy(new Vector3(point.x, point.y, point.z))
+                    css.position.y -= .2
+                    const cssScaleFactor = .007
+                    css.scale.set(cssScaleFactor, cssScaleFactor, cssScaleFactor)
+                    css.updateMatrix()
+                    // ADD TO SCENE
+                    css3dScene.add(css);
+                })
+            })
+        }
+
         function initInstancedSmoothies(smoothies: Smoothie[]) {
             console.log('initting instanced Smoothie')
             const loader = new GLTFLoader()
