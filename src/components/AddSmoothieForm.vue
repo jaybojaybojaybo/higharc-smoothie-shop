@@ -25,11 +25,14 @@ export default defineComponent({
         const ingredientOptions = ref([] as Ingredient[])
         const contentString = ref("")
         const css = ref({} as CSS3DSprite)
+        const x = -2.7
+        const y = 0
+        const z = 1
 
-        async function addFormInit() {            
+        async function addFormInit() {
             // GET INGREDIENT OPTIONS
             ingredientOptions.value = await getAllIngredients() as Ingredient[]
-            let ingredientsInputs = ref("")
+            let ingredientsContent = ref("")
             // CREATE INGREDIENT FORM INPUTS
             for (let iO of ingredientOptions.value) {
                 let ingredientCheckboxString = String.raw
@@ -40,7 +43,7 @@ export default defineComponent({
                         >
                         <span for="${iO.name}" class="form-label inline-block ml-2">${iO.name}</span>
                     </div>`
-                ingredientsInputs.value += ingredientCheckboxString
+                ingredientsContent.value += ingredientCheckboxString
             }
             // CREATE FORM
             contentString.value = 
@@ -53,7 +56,7 @@ export default defineComponent({
                         </label>
                         <span class="text-white font-semibold">Ingredients:</span>
                         <label class="items-center">` +
-                            ingredientsInputs.value
+                            ingredientsContent.value
                         + `</label>
                         <button type="button"
                                 class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 my-2 rounded-l"
@@ -70,7 +73,39 @@ export default defineComponent({
             smoothieContent.body.style.background = new Color(0x000000).getStyle();
             // CREATE CSS3D
             css.value = new CSS3DSprite(smoothieContent.body);
-            css.value.position.copy(new Vector3(-3, 0, 2));
+            css.value.position.copy(new Vector3(x, y, z));
+            const scaleFactor = .007
+            css.value.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            // LISTENERS
+            css.value.element.addEventListener('mousedown', handleClick, true)
+            // ADD TO SCENE
+            css3dScene.add(css.value);
+        }
+
+        async function detailsFormInit() {
+            let ingredientsContent = ref("")
+            for (let iO of (currentSmoothie.value as Smoothie).ingredients) {
+                let ingredientNameHtml = String.raw
+                    `<div class="w-full px-3">                        
+                        <span class="form-label inline-block ml-2">${iO.name}</span>
+                    </div>`
+                ingredientsContent.value += ingredientNameHtml
+            }
+            // CREATE DETAILS HTML
+            contentString.value = 
+                `<h1 class="text-2xl font-bold text-white">${currentSmoothie.value?.name}</h1>
+                <div class="justify-center flex text-white">` +
+                    ingredientsContent.value
+                + `</div>`
+            // PREP FORM FOR CSS3D
+            const currentSmoothieContent = new DOMParser().parseFromString(
+                contentString.value,
+                "text/html"
+            );
+            currentSmoothieContent.body.style.background = new Color(0x000000).getStyle();
+            // CREATE CSS3D
+            css.value = new CSS3DSprite(currentSmoothieContent.body);
+            css.value.position.copy(new Vector3(x, y, z));
             const scaleFactor = .007
             css.value.scale.set(scaleFactor, scaleFactor, scaleFactor);
             // LISTENERS
@@ -80,7 +115,7 @@ export default defineComponent({
         }
 
         watch(
-            () => currentSmoothie.value, 
+            () => (currentSmoothie.value as Smoothie), 
             (newValue: Smoothie) => {
                 console.log('smoothie update in Readout!')
             }
@@ -142,7 +177,8 @@ export default defineComponent({
 
         return {
             handleClick,
-            addFormInit
+            addFormInit,
+            detailsFormInit
         }
     },
 });
