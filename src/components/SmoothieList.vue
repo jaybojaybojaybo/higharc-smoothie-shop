@@ -122,8 +122,18 @@ export default defineComponent({
 
         // * List 3D OBJECT METHODS * //
         function listDestroy(): void {
-            scene.remove.apply(scene, scene.children)
-            css3dScene.remove.apply(css3dScene, css3dScene.children)
+            for (let i = scene.children.length - 1; i >= 0; i--) {
+                if (scene.children[i].type === 'Group') {
+                    scene.remove(scene.children[i])
+                } else if (scene.children[i].name.includes("shopWall")) {
+                    scene.remove(scene.children[i])
+                }
+            }
+            for (let i = css3dScene.children.length - 1; i >= 0; i--) {
+                if (css3dScene.children[i].name.includes('smoothie')) {
+                    css3dScene.remove(css3dScene.children[i])
+                }
+            }
         }
         function listInit(): void {
             for (let smoothie of smoothieList.value) {
@@ -134,6 +144,7 @@ export default defineComponent({
             let shopGeo = new PlaneGeometry(gridSize.value * 2, gridSize.value * 2)
             let shopMat = new MeshBasicMaterial({color: 0xb09c61, side: DoubleSide})
             let shopWall = new Mesh(shopGeo, shopMat)
+            shopWall.name = 'shopWall'
             shopWall.position.z = -5
             scene.add(shopWall)
             // SET GRID
@@ -154,13 +165,13 @@ export default defineComponent({
             if (_debug) {console.log('listInit points: ', smoothiePoints.value)}            
         }
 
-        // watch(
-        //     () => gridSize.value, 
-        //     (newValue: number) => {
-        //         listDestroy()
-        //         listInit()
-        //     }
-        // )
+        watch(
+            () => gridSize.value, 
+            (newValue: number) => {
+                listDestroy()
+                listInit()
+            }
+        )
 
         // * RENDER LOOP - RECURSIVE * //
         const animate = () => {
