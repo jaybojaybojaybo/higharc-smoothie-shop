@@ -1,26 +1,28 @@
 <template>
-    <SmoothieCard   :smoothies="smoothiesList"
-                    :coords="smoothiePoints"
-                    @deleteSmoothie="onDeleteSmoothie"
+    <SmoothieCard   v-for="smoothie of smoothieList"
+                    :key="smoothie.index"
+                    :smoothie="smoothie"
+                    :index="smoothie.index"
+                    :coord="smoothiePoints[smoothieList.indexOf(smoothie)]"
                     ref="card">
     </SmoothieCard>
     <AddSmoothieForm    v-if="addMode" 
                         @addSmoothie="onAddSmoothie" 
-                        @deleteSmoothie="onDeleteSmoothie"
                         ref="addForm">
     </AddSmoothieForm>
-    <SmoothieDetails    v-if="!addMode && selectedSmoothie"
-                        :smoothie="selectedSmoothie"                        
-                        @addSmoothie="onAddSmoothie" 
+    <SmoothieDetails    v-for="(smoothie, index) of selectedSmoothies" 
+                        :key="smoothie.name"
+                        :smoothie="smoothie"
+                        @closeSelectedSmoothie="onClearSelectedSmoothie"
                         @deleteSmoothie="onDeleteSmoothie"
                         ref="details">
     </SmoothieDetails>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, reactive, provide, Ref } from "vue"
+import { defineComponent, onMounted, onUnmounted, ref, reactive, provide, Ref, watch } from "vue"
 
-import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh } from 'three'
+import { Scene, Color, DirectionalLight, HemisphereLight, Vector3, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh, Group } from 'three'
 import { CSS3DSprite } from "three/examples/jsm/renderers/CSS3DRenderer";
 
 import Smoothie from "../models/Smoothie"
@@ -45,31 +47,36 @@ export default defineComponent({
         SmoothieDetails
     },
     setup() {
-        const debug = true
-        const smoothiesList = ref<Smoothie[]>([])
+        const _debug = true
+        const smoothieList = ref<Smoothie[]>([])
         const smoothiePoints = ref<Vector3[]>([])
         const gridSize = ref(0) // in meters
-        const selectedSmoothie = ref(smoothiesList.value[0]) as Ref<Smoothie>
-        const selectedSmoothiePoint = ref(new Vector3(0, 0, 0)) as Ref<Vector3>
+        const selectedSmoothies = ref([]) as Ref<Smoothie[]>
         const card = ref<InstanceType<typeof SmoothieCard>>()
         const addForm = ref<InstanceType<typeof AddSmoothieForm>>()
-        const addMode = ref<Boolean>(false)
+        const details = ref<InstanceType<typeof SmoothieDetails>>()
+        const addMode = ref<Boolean>(true)
 
         const onAddSmoothie = (newSmoothie: Smoothie) => {
-            smoothiesList.value.push(newSmoothie)
-            if (debug === true) { console.log('adding smoothie!', smoothiesList.value) }
-            css3dScene.children.forEach((child) => {
-                if (child instanceof CSS3DSprite) {
-                    child.parent?.remove(child)
-                }
-            })
-            listInit(scene);
-            (card.value as InstanceType<typeof SmoothieCard>).initInstancedSmoothies(smoothiesList.value);
+            smoothieList.value.push(newSmoothie)
+            if (_debug) { console.log('adding smoothie!', smoothieList.value) }
+            listInit();
+            // Re-initialize form
             (addForm.value as InstanceType<typeof AddSmoothieForm>).addFormInit();
         }
-        const onDeleteSmoothie = (name: string) => {
-            smoothiesList.value = smoothiesList.value?.filter((s) => s.name !== name)
-            if (debug === true) {console.log('deleting smoothie! ', smoothiesList.value?.filter((s) => s.name !== name))}
+        function onClearSelectedSmoothie(isAddMode: Boolean) {
+            addMode.value = isAddMode
+            selectedSmoothies.value.length = 0
+        }
+        const onDeleteSmoothie = (deletedSmoothie: Smoothie) => {
+            addMode.value = true
+            if (_debug) {console.log('LIST: deleted Smoothie: ', deletedSmoothie)}
+            let deletedIndex = smoothieList.value.indexOf(deletedSmoothie)
+            if (_debug) {console.log('LIST: smoothieList after delete: ', smoothieList.value)}
+            // CLEAR MODELS AND RE-INITIALIZE
+            listDestroy()
+            smoothieList.value.splice(deletedIndex,1)
+            listInit();
         }
 
         // THREE.JS SETUP
@@ -99,32 +106,30 @@ export default defineComponent({
         raycasterRef.value.setFromCamera(mouseRef.value, perspCamera)
 
         // * EVENTS * //
-        // Smoothie Selection
-        function clearSmoothieSelection(): void {
-            selectedSmoothie.value = {} as Smoothie
-            selectedSmoothiePoint.value = new Vector3(0, 0, 0)
-            addMode.value = false
-        }
         // Smoothie Click
         function handleIntersects(event: MouseEvent) { 
+            addMode.value = false
             useIntersectHandler(
                 event, 
                 raycasterRef, 
                 scene, 
-                smoothiesList as Ref<Smoothie[]>, 
-                selectedSmoothie, 
-                clearSmoothieSelection
-            )
-            addMode.value = false
+                smoothieList as Ref<Smoothie[]>, 
+                selectedSmoothies, 
+                onClearSelectedSmoothie
+            )            
         }
         css3DRenderer.domElement.addEventListener('click', handleIntersects, true)
 
         // * List 3D OBJECT METHODS * //
-        function listDestroy(scene: Scene): void {
+        function listDestroy(): void {
             scene.remove.apply(scene, scene.children)
+            css3dScene.remove.apply(css3dScene, css3dScene.children)
         }
-        function listInit(scene: Scene): void {
-            gridSize.value = Math.round(Math.sqrt((smoothiesList.value as Smoothie[]).length))
+        function listInit(): void {
+            for (let smoothie of smoothieList.value) {
+                smoothie.index = smoothieList.value.indexOf(smoothie)
+            }
+            gridSize.value = Math.round(Math.sqrt((smoothieList.value as Smoothie[]).length))
             // SET BACKGROUND WALL SIZE
             let shopGeo = new PlaneGeometry(gridSize.value * 2, gridSize.value * 2)
             let shopMat = new MeshBasicMaterial({color: 0xb09c61, side: DoubleSide})
@@ -132,11 +137,12 @@ export default defineComponent({
             shopWall.position.z = -5
             scene.add(shopWall)
             // SET GRID
-            smoothiePoints.value = smoothiesList.value.map((ssl) => {
+            smoothiePoints.value.length = 0
+            smoothiePoints.value = smoothieList.value.map((ssl) => {
                 let x, y, z
                 x = y = z = 0
-                const index = smoothiesList.value.indexOf(ssl)
-                if (debug === true) {console.log('gridsize: ', gridSize.value)}
+                const index = smoothieList.value.indexOf(ssl)
+                if (_debug) {console.log('gridsize: ', gridSize.value)}
                 if (gridSize.value > 1) {
                     x = index%gridSize.value - Math.ceil(gridSize.value/2)/2
                     y = Math.floor(index/gridSize.value) - gridSize.value/2
@@ -145,8 +151,16 @@ export default defineComponent({
                 } 
                 return new Vector3(x, y, z)
             })
-            if (debug === true) {console.log('sessionPoints: ', smoothiePoints.value)}
+            if (_debug) {console.log('listInit points: ', smoothiePoints.value)}            
         }
+
+        // watch(
+        //     () => gridSize.value, 
+        //     (newValue: number) => {
+        //         listDestroy()
+        //         listInit()
+        //     }
+        // )
 
         // * RENDER LOOP - RECURSIVE * //
         const animate = () => {
@@ -175,7 +189,7 @@ export default defineComponent({
 
         onMounted(async () => {
             // get localStorage data or initialize from data/smoothies via getAllSmoothies()
-            smoothiesList.value = window.localStorage.getItem('smoothies') && typeof window.localStorage.getItem('smoothies') === 'string'            
+            smoothieList.value = window.localStorage.getItem('smoothies') && typeof window.localStorage.getItem('smoothies') === 'string'            
                 ? JSON.parse(window.localStorage.getItem('smoothies') as string) as Smoothie[]
                 : await getAllSmoothies() as Smoothie[]
 
@@ -187,7 +201,7 @@ export default defineComponent({
             useMouseMove(css3DRenderer.domElement, mouseRef.value)
             // EVENTS
             window.addEventListener('resize', handleResize, true)
-            listInit(scene)
+            listInit()
             animate()
         })
 
@@ -195,20 +209,23 @@ export default defineComponent({
             document.querySelector('#app')?.removeChild(webGLRenderer.domElement)
             document.querySelector('#app')?.removeChild(css3DRenderer.domElement)
             window.removeEventListener('resize', handleResize, true)
-            // window.localStorage.setItem('smoothies', JSON.stringify(smoothiesList.value))
-            listDestroy(scene)
+            // window.localStorage.setItem('smoothies', JSON.stringify(smoothieList.value))
+            listDestroy()
         })
 
         return {
-            smoothiesList,
+            smoothieList,
             smoothiePoints,
             onAddSmoothie,
+            onClearSelectedSmoothie,
             onDeleteSmoothie,
-            selectedSmoothie,
-            selectedSmoothiePoint,
+            selectedSmoothies,
             card,
             addForm,
-            addMode
+            details,
+            addMode,
+            scene,
+            css3dScene
         }
     }
 })
