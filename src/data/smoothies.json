@@ -1,7 +1,7 @@
 {
     "smoothies": [
         {
-            "name": "Blue Moo",
+            "name": "Than",
             "ingredients": [
                 {
                     "name": "Milk",
@@ -14,7 +14,24 @@
             ]
         },
         {
-            "name": "Blue No Moo",
+            "name": "Never",
+            "ingredients": [
+                {
+                    "name": "Oat Milk",
+                    "type": "Non-Dairy"
+                },
+                {
+                    "name": "Banana",
+                    "type": "Fruit"
+                },
+                {
+                    "name": "Cacao",
+                    "type": "Add-On"
+                }
+            ]
+        },
+        {
+            "name": "Better",
             "ingredients": [
                 {
                     "name": "Oat Milk",
@@ -27,71 +44,12 @@
             ]
         },
         {
-            "name": "Blue",
-            "ingredients": [                
+            "name": "Late",
+            "ingredients": [
                 {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Red",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Green",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Orange",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Purple",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Raspberry",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Gold",
-            "ingredients": [                
-                {
-                    "name": "Blueberries",
-                    "type": "Fruit"
-                }
-            ]
-        },
-        {
-            "name": "Silver",
-            "ingredients": [                
+                    "name": "Oat Milk",
+                    "type": "Non-Dairy"
+                },
                 {
                     "name": "Blueberries",
                     "type": "Fruit"
