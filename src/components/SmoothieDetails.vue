@@ -65,6 +65,7 @@ export default defineComponent({
             () => (currentSmoothie.value as Smoothie), 
             (newValue: Smoothie) => {
                 console.log('smoothie update in Readout!')
+                emit('closeSelectedSmoothie')
             }
         )
 
@@ -80,51 +81,14 @@ export default defineComponent({
         function handleClick(event: Event) {
             console.log('handling click in readoutdisplay: ', event.target)            
             event.preventDefault()
-            if ((event.target as HTMLInputElement).type === 'checkbox') {
+            if ((event.target as HTMLInputElement).type === 'button') {
                 event.stopImmediatePropagation()
-                document.getElementById(event.target.id)?.toggleAttribute('checked')
-            } else if ((event.target as HTMLInputElement).type === 'text') {
-                event.stopImmediatePropagation()
-                document.getElementById(event.target.id)?.focus()
-            } else if ((event.target as HTMLInputElement).type === 'button') {
-                event.stopImmediatePropagation()
-                createSmoothie()
-                resetForm()
+                emit('deleteSmoothie', currentSmoothie.value)
             } 
-        }
-
-        let createSmoothie = () => {
-            // blank Smoothie object
-            const formData = {
-                name: "",
-                ingredients: []
-            } as Smoothie
-            // data from form
-            formData.name = (document.getElementById('name') as HTMLInputElement).value
-            if (ingredientOptions.value) {
-                for (let iO of ingredientOptions.value) {
-                    let element = document.getElementById(iO.name) as HTMLInputElement
-                    if (element.checked) {
-                        formData.ingredients.push(iO)
-                    }
-                }
-            }
-
-            // Add to sessionSmoothieList
-            const form = ref(document.getElementById('smoothie-form') as HTMLFormElement)
-            form.value.reset()
-            emit('addSmoothie', formData)
-        }
-
-        let resetForm = () => {
-            for (let i0 of ingredientOptions.value) {
-                (document.getElementById(i0.name) as HTMLInputElement).checked = false
-            }
         }
 
         return {
             handleClick,
-            addFormInit,
             detailsFormInit
         }
     },
