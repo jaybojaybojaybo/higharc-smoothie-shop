@@ -15,10 +15,10 @@ export default defineComponent({
     props: {
         smoothie: {
           type: Object as PropType<Smoothie>,
-          required: false,
+          required: true,
         },
     },
-    emits: ['addSmoothie', 'deleteSmoothie'],
+    emits: ['closeSelectedSmoothie', 'deleteSmoothie'],
     setup(props, { emit }) {
         const currentSmoothie = toRef(props, 'smoothie')
         const css3dScene = inject("css3dScene") as Scene;
@@ -29,21 +29,27 @@ export default defineComponent({
         const y = 0
         const z = 1
 
-        async function detailsFormInit() {
+        async function detailsFormInit(smoothie: Smoothie) {
+            console.log('7')
             let ingredientsContent = ref("")
-            for (let iO of (currentSmoothie.value as Smoothie).ingredients) {
+            for (let iO of (smoothie as Smoothie).ingredients) {
                 let ingredientNameHtml = String.raw
                     `<div class="w-full px-3">                        
-                        <span class="form-label inline-block ml-2">${iO.name}</span>
+                        <span class="form-label ml-2">${iO.name}</span>
                     </div>`
                 ingredientsContent.value += ingredientNameHtml
             }
             // CREATE DETAILS HTML
             contentString.value = 
-                `<h1 class="text-2xl font-bold text-white">${currentSmoothie.value?.name}</h1>
-                <div class="justify-center flex text-white">` +
+                `<h1 class="text-2xl font-bold text-smoothie-blue">Name: <span class="text-white">${smoothie.name}</span></h1>
+                <div class="justify-center flex text-white">
+                    <h2 class="text-lg font-semibold text-smoothie-blue block">Ingredients: </h2>` +
                     ingredientsContent.value
-                + `</div>`
+                + `</div>
+                <button type="button"
+                        class="bg-gray-300 hover:bg-red-600 text-gray-800 hover:text-white font-bold py-2 px-4 my-2 rounded-l">
+                    DELETE SMOOTHIE
+                </button>`
             // PREP FORM FOR CSS3D
             const currentSmoothieContent = new DOMParser().parseFromString(
                 contentString.value,
@@ -64,22 +70,23 @@ export default defineComponent({
         watch(
             () => (currentSmoothie.value as Smoothie), 
             (newValue: Smoothie) => {
-                console.log('smoothie update in Readout!')
-                emit('closeSelectedSmoothie')
+                // emit('closeSelectedSmoothie', false)
+                detailsFormInit(newValue)
             }
         )
 
         onMounted(async() => {            
-            detailsFormInit()
+            detailsFormInit(currentSmoothie.value)
         })
 
         onUnmounted(() => {
+            console.log('Details unmounting')
             css.value.parent?.remove(css.value)
             css.value.element.removeEventListener('click', handleClick)
         });
 
         function handleClick(event: Event) {
-            console.log('handling click in readoutdisplay: ', event.target)            
+            console.log('handling click in details display: ', event.target)            
             event.preventDefault()
             if ((event.target as HTMLInputElement).type === 'button') {
                 event.stopImmediatePropagation()
