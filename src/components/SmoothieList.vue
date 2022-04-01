@@ -59,10 +59,10 @@ export default defineComponent({
 
         const onAddSmoothie = (newSmoothie: Smoothie) => {
             smoothieList.value.push(newSmoothie)
+            addMode.value = false
             if (_debug) { console.log('adding smoothie!', smoothieList.value) }
             listInit();
             // Re-initialize form
-            (addForm.value as InstanceType<typeof AddSmoothieForm>).addFormInit();
         }
         function onClearSelectedSmoothie(isAddMode: Boolean) {
             addMode.value = isAddMode
@@ -220,7 +220,7 @@ export default defineComponent({
             document.querySelector('#app')?.removeChild(webGLRenderer.domElement)
             document.querySelector('#app')?.removeChild(css3DRenderer.domElement)
             window.removeEventListener('resize', handleResize, true)
-            // window.localStorage.setItem('smoothies', JSON.stringify(smoothieList.value))
+            window.localStorage.setItem('smoothies', JSON.stringify(smoothieList.value))
             listDestroy()
         })
 
