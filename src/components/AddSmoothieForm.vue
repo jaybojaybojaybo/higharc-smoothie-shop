@@ -12,8 +12,9 @@ import ingredients from '../data/ingredients.json'
 import { getAllIngredients } from "../api/read";
 
 export default defineComponent({    
-    emits: ['addSmoothie', 'deleteSmoothie'],
+    emits: ['addSmoothie'],
     setup(props, { emit }) {
+        const debug = false
         const css3dScene = inject("css3dScene") as Scene;
         const ingredientOptions = ref([] as Ingredient[])
         const contentString = ref("")
@@ -40,19 +41,19 @@ export default defineComponent({
             }
             // CREATE FORM
             contentString.value = 
-                `<h1 class="text-2xl font-bold text-white">New Smoothie</h1>
+                `<h1 class="text-2xl font-bold text-smoothie-blue">New Smoothie</h1>
                 <div class="justify-center flex text-white">
                     <form class="max-w-xs" id="smoothie-form">
                         <label class="items-center my-2">
                             <span for="name" class="text-white font-semibold">Smoothie Name: </span>
                             <input type="text" class="mt-1 block w-md text-black text-center px-5" id="name">
                         </label>
-                        <span class="text-white font-semibold">Ingredients:</span>
+                        <span class="text-smoothie-blue font-semibold">Ingredients:</span>
                         <label class="items-center">` +
                             ingredientsContent.value
                         + `</label>
                         <button type="button"
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 my-2 rounded-l"
+                                class="bg-gray-300 hover:bg-smoothie-blue text-gray-800 hover:text-white font-bold py-2 px-4 my-2 rounded-l"
                         >
                             Add New Smoothie
                         </button>
@@ -66,6 +67,7 @@ export default defineComponent({
             smoothieContent.body.style.background = new Color(0x000000).getStyle();
             // CREATE CSS3D
             css.value = new CSS3DSprite(smoothieContent.body);
+            css.value.name = 'addForm'
             css.value.position.copy(new Vector3(x, y, z));
             const scaleFactor = .007
             css.value.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -75,7 +77,7 @@ export default defineComponent({
             css3dScene.add(css.value);
         }
 
-        onMounted(async() => {            
+        onMounted(async() => {
             addFormInit()
         })
 
@@ -85,7 +87,7 @@ export default defineComponent({
         });
 
         function handleClick(event: Event) {
-            console.log('handling click in readoutdisplay: ', event.target)            
+            if (debug) {console.log('handling click in add smoothie form: ', event.target)}
             event.preventDefault()
             if ((event.target as HTMLInputElement).type === 'checkbox') {
                 event.stopImmediatePropagation()
