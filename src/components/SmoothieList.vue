@@ -9,7 +9,8 @@
                         @deleteSmoothie="onDeleteSmoothie"
                         ref="addForm">
     </AddSmoothieForm>
-    <SmoothieDetails    v-if="!addMode"
+    <SmoothieDetails    v-if="!addMode && selectedSmoothie"
+                        :smoothie="selectedSmoothie"                        
                         @addSmoothie="onAddSmoothie" 
                         @deleteSmoothie="onDeleteSmoothie"
                         ref="details">
@@ -48,11 +49,11 @@ export default defineComponent({
         const smoothiesList = ref<Smoothie[]>([])
         const smoothiePoints = ref<Vector3[]>([])
         const gridSize = ref(0) // in meters
-        const selectedSmoothie = ref({}) as Ref<Smoothie>
+        const selectedSmoothie = ref(smoothiesList.value[0]) as Ref<Smoothie>
         const selectedSmoothiePoint = ref(new Vector3(0, 0, 0)) as Ref<Vector3>
         const card = ref<InstanceType<typeof SmoothieCard>>()
         const addForm = ref<InstanceType<typeof AddSmoothieForm>>()
-        const addMode = ref<Boolean>(true)
+        const addMode = ref<Boolean>(false)
 
         const onAddSmoothie = (newSmoothie: Smoothie) => {
             smoothiesList.value.push(newSmoothie)
@@ -114,7 +115,7 @@ export default defineComponent({
                 selectedSmoothie, 
                 clearSmoothieSelection
             )
-            addMode.value = true
+            addMode.value = false
         }
         css3DRenderer.domElement.addEventListener('click', handleIntersects, true)
 
