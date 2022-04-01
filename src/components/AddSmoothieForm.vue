@@ -14,11 +14,11 @@ import { getAllIngredients } from "../api/read";
 export default defineComponent({    
     emits: ['addSmoothie'],
     setup(props, { emit }) {
-        const debug = false
+        const debug = true
         const css3dScene = inject("css3dScene") as Scene;
         const ingredientOptions = ref([] as Ingredient[])
-        const contentString = ref("")
-        const css = ref({} as CSS3DSprite)
+        // const contentString = ref("")
+        // const css = ref({} as CSS3DSprite)
         const x = -2.7
         const y = 0
         const z = 1
@@ -40,7 +40,7 @@ export default defineComponent({
                 ingredientsContent.value += ingredientCheckboxString
             }
             // CREATE FORM
-            contentString.value = 
+            let contentString = 
                 `<h1 class="text-2xl font-bold text-smoothie-blue">New Smoothie</h1>
                 <div class="justify-center flex text-white">
                     <form class="max-w-xs" id="smoothie-form">
@@ -61,20 +61,20 @@ export default defineComponent({
                 </div>`
             // PREP FORM FOR CSS3D
             const smoothieContent = new DOMParser().parseFromString(
-                contentString.value,
+                contentString,
                 "text/html"
             );
             smoothieContent.body.style.background = new Color(0x000000).getStyle();
             // CREATE CSS3D
-            css.value = new CSS3DSprite(smoothieContent.body);
-            css.value.name = 'addForm'
-            css.value.position.copy(new Vector3(x, y, z));
+            let css = new CSS3DSprite(smoothieContent.body);
+            css.name = 'addForm'
+            css.position.copy(new Vector3(x, y, z));
             const scaleFactor = .007
-            css.value.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            css.scale.set(scaleFactor, scaleFactor, scaleFactor);
             // LISTENERS
-            css.value.element.addEventListener('mousedown', handleClick, true)
+            css.element.addEventListener('mousedown', handleClick, true)
             // ADD TO SCENE
-            css3dScene.add(css.value);
+            css3dScene.add(css);
         }
 
         onMounted(async() => {
@@ -82,8 +82,14 @@ export default defineComponent({
         })
 
         onUnmounted(() => {
-            css.value.parent?.remove(css.value)
-            css.value.element.removeEventListener('click', handleClick)
+            if (debug) {console.log('AddForm unmounting: ', css3dScene.children)}
+            // css.element.removeEventListener('click', handleClick)
+            for (let i = css3dScene.children.length - 1; i >= 0; i--) {
+                if (css3dScene.children[i].name.includes('add')) {
+                    console.log('removing child')
+                    css3dScene.remove(css3dScene.children[i])
+                }
+            }
         });
 
         function handleClick(event: Event) {
@@ -118,7 +124,6 @@ export default defineComponent({
                     }
                 }
             }
-
             // Add to sessionSmoothieList
             const form = ref(document.getElementById('smoothie-form') as HTMLFormElement)
             form.value.reset()
