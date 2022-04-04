@@ -61,6 +61,7 @@ export default defineComponent({
             smoothieList.value.push(newSmoothie)
             addMode.value = false
             if (_debug) { console.log('adding smoothie!', smoothieList.value) }
+            window.localStorage.setItem('smoothies', JSON.stringify(smoothieList.value))
             listInit();
             // Re-initialize form
         }
@@ -73,6 +74,7 @@ export default defineComponent({
             if (_debug) {console.log('LIST: deleted Smoothie: ', deletedSmoothie)}
             let deletedIndex = smoothieList.value.indexOf(deletedSmoothie)
             if (_debug) {console.log('LIST: smoothieList after delete: ', smoothieList.value)}
+            window.localStorage.setItem('smoothies', JSON.stringify(smoothieList.value))
             // CLEAR MODELS AND RE-INITIALIZE
             listDestroy()
             smoothieList.value.splice(deletedIndex,1)
